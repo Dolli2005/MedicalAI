@@ -1,0 +1,16 @@
+{
+  "name": "mediverse-ai-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for MediVerse.AI healthcare platform",
+  "scripts": {
+    "start": "lite-server",
+    "dev": "lite-server"
+  },
+  "dependencies": {
+    "three": "^0.128.0",
+    "@fortawesome/fontawesome-free": "^6.4.0"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}

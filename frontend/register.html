@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register | MediVerse.AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        body{ font-family: Inter, system-ui, sans-serif; background:#0a0f2b; color:#f8fafc; display:flex; align-items:center; justify-content:center; height:100vh; }
+        .card{ background:rgba(15,23,42,0.9); padding:2rem; border-radius:12px; width:360px; }
+        .form-group{ margin-bottom:1rem }
+        .form-control{ width:100%; padding:0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03); color:#fff }
+        .btn{ width:100%; padding:0.75rem; border-radius:8px; border:none; cursor:pointer }
+        .btn-primary{ background:#1a56db; color:#fff }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Create account</h2>
+        <div class="form-group">
+            <label>Name</label>
+            <input id="name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input id="email" type="email" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input id="password" type="password" class="form-control" />
+        </div>
+        <button id="registerBtn" class="btn btn-primary">Register</button>
+        <p style="margin-top:0.75rem; font-size:0.9rem; color: #cbd5e1">Already have an account? <a href="/login.html">Login</a></p>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('registerBtn').addEventListener('click', async function(){
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            if(!name||!email||password.length<6){ alert('Please fill in valid details'); return; }
+            try{
+                const data = await authApi.register({ name, email, password });
+                if(data.token){ try{ localStorage.setItem('mv_token', data.token); }catch(e){} }
+                if(data.user){ try{ localStorage.setItem('mv_user', JSON.stringify(data.user)); }catch(e){} }
+                window.location.href = '/Appointment.html';
+            }catch(err){ alert(err.message || 'Registration failed'); }
+        });
+    </script>
+</body>
+</html>

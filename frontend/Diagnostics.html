@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostics & Reports | MediVerse.AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary-blue: #1a56db;
+            --dark-blue: #0f172a;
+            --midnight: #0a0f2b;
+            --slate: #64748b;
+            --light-slate: #94a3b8;
+            --platinum: #f8fafc;
+            --emerald: #059669;
+            --crimson: #dc2626;
+            --amber: #d97706;
+            --neural-purple: #7c3aed;
+            --vital-orange: #f59e0b;
+            --lab-green: #10b981;
+            --imaging-purple: #8b5cf6;
+            --genetic-pink: #ec4899;
+        }
+
+        body {
+            background: var(--midnight);
+            color: var(--platinum);
+            overflow-x: hidden;
+            font-weight: 300;
+        }
+
+        /* Professional Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--platinum);
+        }
+
+        .logo-icon {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--light-slate);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--platinum);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+            background: rgba(26, 86, 219, 0.1);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--light-slate);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--platinum);
+        }
+
+        .dropdown-icon {
+            width: 20px;
+            text-align: center;
+            color: var(--primary-blue);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .emergency-btn {
+            background: var(--crimson);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .emergency-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        /* Diagnostics Page Styles */
+        .diagnostics-container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--platinum) 0%, var(--primary-blue) 50%, var(--neural-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--light-slate);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .icon-vital { background: rgba(245, 158, 11, 0.2); color: var(--vital-orange); }
+        .icon-lab { background: rgba(16, 185, 129, 0.2); color: var(--lab-green); }
+        .icon-imaging { background: rgba(139, 92, 246, 0.2); color: var(--imaging-purple); }
+        .icon-genetic { background: rgba(236, 72, 153, 0.2); color: var(--genetic-pink); }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--light-slate);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-blue);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .report-type {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .type-vital { background: rgba(245, 158, 11, 0.1); color: var(--vital-orange); }
+        .type-lab { background: rgba(16, 185, 129, 0.1); color: var(--lab-green); }
+        .type-imaging { background: rgba(139, 92, 246, 0.1); color: var(--imaging-purple); }
+        .type-genetic { background: rgba(236, 72, 153, 0.1); color: var(--genetic-pink); }
+
+        .report-date {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        .report-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .report-preview {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .report-metrics {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            color: var(--light-slate);
+            font-size: 0.8rem;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #1e40af;
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--platinum);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Detailed Report View */
+        .report-detail-view {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+        }
+
+        /* Charts and Visualizations */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Test Results Table */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .results-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light-slate);
+            font-weight: 500;
+        }
+
+        .results-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-normal {
+            color: var(--emerald);
+        }
+
+        .result-abnormal {
+            color: var(--crimson);
+            font-weight: 600;
+        }
+
+        .result-warning {
+            color: var(--amber);
+        }
+
+        /* AI Analysis */
+        .ai-analysis {
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-header i {
+            color: var(--neural-purple);
+            font-size: 1.5rem;
+        }
+
+        .ai-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .analysis-title {
+            font-size: 0.9rem;
+            color: var(--light-slate);
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Comparison Tools */
+        .comparison-tools {
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-header i {
+            color: var(--emerald);
+            font-size: 1.5rem;
+        }
+
+        .comparison-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .timeline-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light-slate);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: var(--light-slate);
+        }
+
+        .filter-select {
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(26, 86, 219, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: var(--emerald); }
+        .status-warning { background: var(--amber); }
+        .status-offline { background: var(--crimson); }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--light-slate);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--slate);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-actions {
+                flex-direction: column;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>MediVerse.AI</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-stethoscope"></i>
+                        Consultation
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-pills"></i>
+                        Pharmacy
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="diagnostics.html" class="nav-link active">
+                        <i class="fas fa-microscope"></i>
+                        Diagnostics
+                    </a>
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">
+                            <span class="dropdown-icon"><i class="fas fa-vial"></i></span>
+                            <span>Lab Tests</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <span class="dropdown-icon"><i class="fas fa-file-medical"></i></span>
+                            <span>Reports</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <span class="dropdown-icon"><i class="fas fa-home"></i></span>
+                            <span>Home Collection</span>
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-robot"></i>
+                        AI Assistant
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Analytics
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="emergency-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Emergency
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Diagnostics Page Content -->
+    <div class="diagnostics-container">
+        <div class="page-header">
+            <h1 class="page-title">Diagnostics & Reports Hub</h1>
+            <p class="page-subtitle">Comprehensive health insights with AI-powered analysis and trend tracking</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-vital">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="stat-value">24</div>
+                <div class="stat-label">Vital Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-lab">
+                    <i class="fas fa-vial"></i>
+                </div>
+                <div class="stat-value">18</div>
+                <div class="stat-label">Lab Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-imaging">
+                    <i class="fas fa-x-ray"></i>
+                </div>
+                <div class="stat-value">9</div>
+                <div class="stat-label">Imaging Studies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-genetic">
+                    <i class="fas fa-dna"></i>
+                </div>
+                <div class="stat-value">3</div>
+                <div class="stat-label">Genetic Reports</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-header">
+                <div class="filter-title">Filter Reports</div>
+                <button class="action-btn secondary">
+                    <i class="fas fa-sync"></i>
+                    Reset Filters
+                </button>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Report Type</label>
+                    <select class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="vital">Vital Signs</option>
+                        <option value="lab">Laboratory</option>
+                        <option value="imaging">Imaging</option>
+                        <option value="genetic">Genetic</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Time Period</label>
+                    <select class="filter-select">
+                        <option value="all">All Time</option>
+                        <option value="7days">Last 7 Days</option>
+                        <option value="30days">Last 30 Days</option>
+                        <option value="3months">Last 3 Months</option>
+                        <option value="1year">Last Year</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="normal">Normal</option>
+                        <option value="abnormal">Abnormal</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Sort By</label>
+                    <select class="filter-select">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="type">Report Type</option>
+                        <option value="status">Health Status</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="all">All Reports</button>
+            <button class="tab-btn" data-tab="vital">Vital Signs</button>
+            <button class="tab-btn" data-tab="lab">Laboratory</button>
+            <button class="tab-btn" data-tab="imaging">Imaging</button>
+            <button class="tab-btn" data-tab="genetic">Genetic</button>
+            <button class="tab-btn" data-tab="trends">Trend Analysis</button>
+            <button class="tab-btn" data-tab="comparison">Comparison</button>
+        </div>
+
+        <!-- All Reports Tab -->
+        <div class="tab-content active" id="all-tab">
+            <div class="reports-grid">
+                <!-- Blood Test Report -->
+                <div class="report-card" data-report-id="LAB-2023-0876">
+                    <div class="report-header">
+                        <div class="report-type type-lab">Laboratory</div>
+                        <div class="report-date">Nov 15, 2023</div>
+                    </div>
+                    <h3 class="report-title">Complete Blood Count (CBC)</h3>
+                    <p class="report-preview">Comprehensive hematology analysis including RBC, WBC, platelets, and hemoglobin levels.</p>
+                    <div class="report-metrics">
+                        <div class="metric">
+                            <div class="metric-value">12.5</div>
+                            <div class="metric-label">Hemoglobin g/dL</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">4.8</div>
+                            <div class="metric-label">WBC Count</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Normal</div>
+                            <div class="metric-label">Status</div>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-chart-line"></i>
+                            View Trends
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ECG Report -->
+                <div class="report-card" data-report-id="IMG-2023-0921">
+                    <div class="report-header">
+                        <div class="report-type type-imaging">Imaging</div>
+                        <div class="report-date">Nov 12, 2023</div>
+                    </div>
+                    <h3 class="report-title">Electrocardiogram (ECG)</h3>
+                    <p class="report-preview">12-lead ECG showing normal sinus rhythm with no significant abnormalities detected.</p>
+                    <div class="report-metrics">
+                        <div class="metric">
+                            <div class="metric-value">72</div>
+                            <div class="metric-label">Heart Rate</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Normal</div>
+                            <div class="metric-label">Rhythm</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Clear</div>
+                            <div class="metric-label">Quality</div>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-chart-line"></i>
+                            View Trends
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lipid Profile -->
+                <div class="report-card" data-report-id="LAB-2023-0743">
+                    <div class="report-header">
+                        <div class="report-type type-lab">Laboratory</div>
+                        <div class="report-date">Nov 8, 2023</div>
+                    </div>
+                    <h3 class="report-title">Lipid Profile</h3>
+                    <p class="report-preview">Comprehensive cholesterol and triglyceride analysis for cardiovascular risk assessment.</p>
+                    <div class="report-metrics">
+                        <div class="metric">
+                            <div class="metric-value">185</div>
+                            <div class="metric-label">Cholesterol</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">45</div>
+                            <div class="metric-label">HDL</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Borderline</div>
+                            <div class="metric-label">Status</div>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-chart-line"></i>
+                            View Trends
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Genetic Screening -->
+                <div class="report-card" data-report-id="GEN-2023-0567">
+                    <div class="report-header">
+                        <div class="report-type type-genetic">Genetic</div>
+                        <div class="report-date">Nov 5, 2023</div>
+                    </div>
+                    <h3 class="report-title">Pharmacogenomic Profile</h3>
+                    <p class="report-preview">Analysis of genetic variants affecting drug metabolism and response to medications.</p>
+                    <div class="report-metrics">
+                        <div class="metric">
+                            <div class="metric-value">Normal</div>
+                            <div class="metric-label">CYP2C19</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Intermediate</div>
+                            <div class="metric-label">CYP2D6</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Low Risk</div>
+                            <div class="metric-label">Overall</div>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-chart-line"></i>
+                            View Trends
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Report View -->
+            <div class="report-detail-view" id="detail-view">
+                <div class="detail-header">
+                    <h2 class="detail-title">Complete Blood Count (CBC) - #LAB-2023-0876</h2>
+                    <div class="detail-actions">
+                        <button class="action-btn secondary">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-share-alt"></i>
+                            Share
+                        </button>
+                        <button class="action-btn primary">
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Test Results -->
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-vial"></i>
+                        Test Results
+                    </h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Your Value</th>
+                                <th>Reference Range</th>
+                                <th>Status</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Hemoglobin</td>
+                                <td>12.5 g/dL</td>
+                                <td>12.0 - 16.0 g/dL</td>
+                                <td class="result-normal">Normal</td>
+                                <td><i class="fas fa-arrow-right" style="color: var(--slate);"></i></td>
+                            </tr>
+                            <tr>
+                                <td>White Blood Cells</td>
+                                <td>4.8 x 10³/μL</td>
+                                <td>4.0 - 11.0 x 10³/μL</td>
+                                <td class="result-normal">Normal</td>
+                                <td><i class="fas fa-arrow-up" style="color: var(--emerald);"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Platelets</td>
+                                <td>285 x 10³/μL</td>
+                                <td>150 - 450 x 10³/μL</td>
+                                <td class="result-normal">Normal</td>
+                                <td><i class="fas fa-arrow-right" style="color: var(--slate);"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Hematocrit</td>
+                                <td>38.5%</td>
+                                <td>36.0 - 48.0%</td>
+                                <td class="result-normal">Normal</td>
+                                <td><i class="fas fa-arrow-down" style="color: var(--amber);"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Charts and Visualizations -->
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Historical Trends
+                    </h3>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">Hemoglobin Trend (6 Months)</div>
+                            <canvas id="hemoglobinChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">WBC Count Trend (6 Months)</div>
+                            <canvas id="wbcChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Analysis -->
+                <div class="ai-analysis">
+                    <div class="ai-header">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI Health Analysis</h3>
+                    </div>
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <div class="analysis-title">Overall Health Score</div>
+                            <div class="analysis-value">87/100</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="analysis-title">Risk Assessment</div>
+                            <div class="analysis-value">Low Risk</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="analysis-title">Trend Direction</div>
+                            <div class="analysis-value">Stable</div>
+                        </div>
+                        <div class="analysis-card">
+                            <div class="analysis-title">Next Recommended Test</div>
+                            <div class="analysis-value">3 Months</div>
+                        </div>
+                    </div>
+                    <div class="recommendation-list" style="margin-top: 1rem;">
+                        <div class="recommendation-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div class="recommendation-text">Your blood parameters are within normal ranges. Consider maintaining current lifestyle habits.</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div class="recommendation-text">Slight decrease in hematocrit noted - ensure adequate iron intake through diet.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Tools -->
+                <div class="comparison-tools">
+                    <div class="comparison-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Historical Comparison</h3>
+                    </div>
+                    <div class="timeline-selector">
+                        <button class="timeline-btn active">3 Months</button>
+                        <button class="timeline-btn">6 Months</button>
+                        <button class="timeline-btn">1 Year</button>
+                        <button class="timeline-btn">All Time</button>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Key Parameters Comparison</div>
+                        <canvas id="comparisonChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Tabs Content -->
+        <div class="tab-content" id="vital-tab">
+            <!-- Vital Signs content -->
+            <div class="empty-state">
+                <i class="fas fa-heartbeat"></i>
+                <h3>Vital Signs Reports</h3>
+                <p>Your blood pressure, heart rate, temperature, and respiratory rate records will appear here.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="lab-tab">
+            <!-- Laboratory content -->
+            <div class="empty-state">
+                <i class="fas fa-vial"></i>
+                <h3>Laboratory Reports</h3>
+                <p>Your blood tests, urine analysis, and other lab reports will appear here.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="imaging-tab">
+            <!-- Imaging content -->
+            <div class="empty-state">
+                <i class="fas fa-x-ray"></i>
+                <h3>Imaging Studies</h3>
+                <p>Your X-rays, CT scans, MRI, and ultrasound reports will appear here.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="genetic-tab">
+            <!-- Genetic content -->
+            <div class="empty-state">
+                <i class="fas fa-dna"></i>
+                <h3>Genetic Reports</h3>
+                <p>Your genetic screening and pharmacogenomic reports will appear here.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="trends-tab">
+            <!-- Trends content -->
+            <div class="empty-state">
+                <i class="fas fa-chart-line"></i>
+                <h3>Trend Analysis</h3>
+                <p>AI-powered analysis of your health trends over time will appear here.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="comparison-tab">
+            <!-- Comparison content -->
+            <div class="empty-state">
+                <i class="fas fa-balance-scale"></i>
+                <h3>Report Comparison</h3>
+                <p>Compare different reports and track changes over time here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-dot status-online"></div>
+            <span>System Online</span>
+        </div>
+        <div class="status-item">
+            <div class="status-dot status-online"></div>
+            <span>AI Neural Network Active</span>
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Diagnostics functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load diagnostics on page load
+            loadDiagnostics();
+            // Tab switching
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Report card click to show details
+            const reportCards = document.querySelectorAll('.report-card');
+            reportCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const reportId = this.getAttribute('data-report-id');
+                    
+                    // In a real app, this would load specific report data
+                    loadReportDetails(reportId);
+                    
+                    // Scroll to detail view
+                    document.getElementById('detail-view').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Initialize charts
+            initializeCharts();
+
+            // AI Assistant
+            document.querySelector('.ai-assistant').addEventListener('click', function() {
+                alert('AI Diagnostic Assistant: "I can help you understand your test results, identify trends, and provide personalized health insights. How can I assist you today?"');
+            });
+
+            // Emergency button
+            document.querySelector('.emergency-btn').addEventListener('click', function() {
+                alert('Emergency protocol activated. Medical assistance is on the way.');
+            });
+
+            // Timeline selector
+            const timelineBtns = document.querySelectorAll('.timeline-btn');
+            timelineBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    timelineBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Load all diagnostics from API
+            async function loadDiagnostics() {
+                try {
+                    const diagnostics = await diagnosticsApi.list();
+                    const reportsGrid = document.querySelector('.reports-grid');
+                    reportsGrid.innerHTML = diagnostics.length ? '' : `
+                        <div class="empty-state">
+                            <i class="fas fa-microscope"></i>
+                            <h3>No Diagnostics Found</h3>
+                            <p>No diagnostic reports have been added yet.</p>
+                        </div>
+                    `;
+                    
+                    // Update quick stats
+                    updateStats(diagnostics);
+                    
+                    // Create report cards
+                    diagnostics.forEach(diagnostic => {
+                        const card = createReportCard(diagnostic);
+                        reportsGrid.appendChild(card);
+                    });
+                } catch (error) {
+                    showMessage('Failed to load diagnostics: ' + error.message, true);
+                }
+            }
+
+            // Create report card element
+            function createReportCard(diagnostic) {
+                const card = document.createElement('div');
+                card.className = 'report-card';
+                card.setAttribute('data-report-id', diagnostic.id);
+                
+                card.innerHTML = `
+                    <div class="report-header">
+                        <div class="report-type type-${diagnostic.type || 'lab'}">${diagnostic.type || 'Laboratory'}</div>
+                        <div class="report-date">${formatDate(diagnostic.date)}</div>
+                    </div>
+                    <h3 class="report-title">${diagnostic.test}</h3>
+                    <p class="report-preview">${diagnostic.description || 'Test results and analysis.'}</p>
+                    <div class="report-metrics">
+                        <div class="metric">
+                            <div class="metric-value">${diagnostic.result}</div>
+                            <div class="metric-label">Result</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${diagnostic.status || 'Pending'}</div>
+                            <div class="metric-label">Status</div>
+                        </div>
+                    </div>
+                    <div class="report-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-chart-line"></i>
+                            View Details
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </button>
+                    </div>
+                `;
+                
+                return card;
+            }
+
+            // Update quick stats based on diagnostics data
+            function updateStats(diagnostics) {
+                const stats = diagnostics.reduce((acc, curr) => {
+                    const type = curr.type?.toLowerCase() || 'lab';
+                    acc[type] = (acc[type] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                // Update stat cards
+                document.querySelector('.stat-value').textContent = stats.vital || 0;
+                document.querySelectorAll('.stat-value')[1].textContent = stats.lab || 0;
+                document.querySelectorAll('.stat-value')[2].textContent = stats.imaging || 0;
+                document.querySelectorAll('.stat-value')[3].textContent = stats.genetic || 0;
+            }
+
+            // Load report details from API
+            async function loadReportDetails(reportId) {
+                try {
+                    const diagnostic = await diagnosticsApi.get(reportId);
+                    
+                    // Update the detail view title
+                    const detailTitle = document.querySelector('.detail-title');
+                    detailTitle.textContent = `${diagnostic.test} - #${reportId}`;
+                    
+                    // Update details and charts as needed
+                    updateDetailsView(diagnostic);
+                    updateCharts(diagnostic);
+                    
+                    // Scroll to details
+                    document.getElementById('detail-view').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } catch (error) {
+                    showMessage('Failed to load report details: ' + error.message, true);
+                }
+            }
+
+            // Initialize charts
+            function initializeCharts() {
+                // Hemoglobin Trend Chart
+                const hemoglobinCtx = document.getElementById('hemoglobinChart').getContext('2d');
+                new Chart(hemoglobinCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                        datasets: [{
+                            label: 'Hemoglobin (g/dL)',
+                            data: [12.8, 12.6, 12.4, 12.3, 12.4, 12.5],
+                            borderColor: '#1a56db',
+                            backgroundColor: 'rgba(26, 86, 219, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 11,
+                                max: 14,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // WBC Count Chart
+                const wbcCtx = document.getElementById('wbcChart').getContext('2d');
+                new Chart(wbcCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                        datasets: [{
+                            label: 'WBC Count (x10³/μL)',
+                            data: [5.2, 4.9, 4.7, 4.6, 4.7, 4.8],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 4,
+                                max: 6,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Comparison Chart
+                const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+                new Chart(comparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Hemoglobin', 'WBC', 'Platelets', 'Hematocrit'],
+                        datasets: [
+                            {
+                                label: 'Current',
+                                data: [12.5, 4.8, 285, 38.5],
+                                backgroundColor: 'rgba(26, 86, 219, 0.8)'
+                            },
+                            {
+                                label: '3 Months Ago',
+                                data: [12.3, 4.6, 290, 39.2],
+                                backgroundColor: 'rgba(100, 116, 139, 0.8)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#94a3b8'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#94a3b8'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

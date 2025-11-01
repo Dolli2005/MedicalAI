@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MediVerse.AI | Healthcare Intelligence Platform</title>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <style>
+        /* Basic reset + font */
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter','SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; }
+        :root{
+            --primary-blue:#1a56db; --dark-blue:#0f172a; --midnight:#0a0f2b; --slate:#64748b;
+            --light-slate:#94a3b8; --platinum:#f8fafc; --emerald:#059669; --crimson:#dc2626;
+            --amber:#d97706; --neural-purple:#7c3aed;
+        }
+        html,body{height:100%;}
+        body{
+            background:var(--midnight);
+            color:var(--platinum);
+            overflow:hidden;
+            height:100vh;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        /* 3D container behind UI */
+        #three-container{ position:fixed; inset:0; z-index:1; }
+
+        /* Top navigation */
+        .navbar{
+            position:fixed; top:0; left:0; right:0;
+            background:rgba(15,23,42,0.95); backdrop-filter: blur(14px);
+            border-bottom:1px solid rgba(255,255,255,0.06);
+            z-index:1000; padding:1rem 2rem;
+        }
+        .nav-container{ max-width:1400px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+        .logo{ display:flex; align-items:center; gap:.75rem; font-weight:700; color:var(--platinum); }
+        .logo-icon{ color:var(--primary-blue); font-size:1.6rem; }
+        .nav-menu{ display:flex; gap:1rem; list-style:none; align-items:center; }
+        .nav-item{ position:relative; }
+        .nav-link{ color:var(--light-slate); text-decoration:none; padding:.5rem .8rem; border-radius:8px; display:flex; gap:.5rem; align-items:center; transition:.18s; }
+        .nav-link:hover{ color:var(--platinum); background:rgba(255,255,255,0.04); }
+        .nav-link.active{ color:var(--primary-blue); background:rgba(26,86,219,0.08); }
+        .dropdown{ position:absolute; top:110%; left:0; min-width:260px; background:rgba(15,23,42,0.98); border-radius:12px; padding:.6rem; box-shadow:0 18px 40px rgba(0,0,0,0.45); opacity:0; visibility:hidden; transform:translateY(-8px); transition:.22s ease; }
+        .nav-item:hover .dropdown{ opacity:1; visibility:visible; transform:translateY(0); }
+        .dropdown-item{ display:flex; gap:.6rem; align-items:center; padding:.6rem .8rem; color:var(--light-slate); border-radius:8px; text-decoration:none; }
+        .dropdown-item:hover{ background:rgba(255,255,255,0.03); color:var(--platinum); }
+
+        .nav-actions{ display:flex; gap:1rem; align-items:center; }
+        .emergency-btn{ background:var(--crimson); color:white; border:none; padding:.6rem 1rem; border-radius:8px; cursor:pointer; font-weight:600; display:flex; gap:.5rem; align-items:center; }
+
+        /* Main panel area (analytics + content) */
+        .main-panel{
+            position:relative;
+            z-index: 200; /* above 3D */
+            max-width:1400px;
+            margin:100px auto;
+            padding:1rem;
+            height:calc(100vh - 120px);
+            overflow:auto;
+        }
+
+        /* Lightweight header */
+        .page-title{ font-size:1.5rem; font-weight:700; margin-bottom:.25rem; }
+        .page-sub{ color:var(--light-slate); margin-bottom:1rem; }
+
+        /* Grid layout for analytics content */
+        .layout-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; }
+        .fullwidth{ grid-column: 1 / -1; }
+
+        .card{
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border-radius:12px; padding:1rem; border:1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+        }
+
+        .card h3{ font-size:1rem; margin-bottom:.6rem; color:var(--platinum); }
+        canvas{ width:100% !important; height:220px !important; display:block; }
+
+        /* AI assistant floating button */
+        .ai-assistant{ position:fixed; right:2rem; bottom:2rem; z-index:1200; width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--primary-blue),var(--neural-purple)); display:flex; align-items:center; justify-content:center; color:white; box-shadow:0 12px 30px rgba(26,86,219,0.25); cursor:pointer; }
+
+        /* Status bar */
+        .status-bar{ position:fixed; left:2rem; bottom:2rem; z-index:1100; display:flex; gap:.6rem; align-items:center; }
+        .status-item{ background:rgba(255,255,255,0.03); padding:.5rem .7rem; border-radius:8px; display:flex; gap:.5rem; align-items:center; color:var(--light-slate); border:1px solid rgba(255,255,255,0.03); }
+
+        /* Responsive */
+        @media (max-width:1100px){
+            .layout-grid{ grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width:700px){
+            .layout-grid{ grid-template-columns: 1fr; margin: 90px 12px; }
+            .nav-menu{ display:none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D background -->
+    <div id="three-container"></div>
+
+    <!-- Top navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-brain logo-icon"></i><span>MediVerse.AI</span></div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="fas fa-stethoscope"></i> Consultation</a>
+                    <div class="dropdown">
+                        <a class="dropdown-item" href="#" id="findDoctorsLink"><i class="fas fa-search dropdown-icon"></i> Find Doctors</a>
+                        <a class="dropdown-item" href="#" id="videoConsultLink"><i class="fas fa-video dropdown-icon"></i> Video Consult</a>
+                        <a class="dropdown-item" href="#" id="appointmentsLink"><i class="fas fa-calendar dropdown-icon"></i> Appointments</a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="fas fa-pills"></i> Pharmacy</a>
+                    <div class="dropdown">
+                        <a class="dropdown-item" href="#" id="eprescriptionsLink"><i class="fas fa-prescription dropdown-icon"></i> E-Prescriptions</a>
+                        <a class="dropdown-item" href="#" id="deliveryLink"><i class="fas fa-truck dropdown-icon"></i> Medicine Delivery</a>
+                        <a class="dropdown-item" href="#" id="orderHistoryLink"><i class="fas fa-history dropdown-icon"></i> Order History</a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link"><i class="fas fa-microscope"></i> Diagnostics</a>
+                    <div class="dropdown">
+                        <a class="dropdown-item" href="#" id="labTestsLink"><i class="fas fa-vial dropdown-icon"></i> Lab Tests</a>
+                        <a class="dropdown-item" href="#" id="reportsLink"><i class="fas fa-file-medical dropdown-icon"></i> Reports</a>
+                        <a class="dropdown-item" href="#" id="homeCollectionLink"><i class="fas fa-home dropdown-icon"></i> Home Collection</a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link" id="aiNav"><i class="fas fa-robot"></i> AI Assistant</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link" id="analyticsNav"><i class="fas fa-chart-line"></i> Analytics</a>
+                </li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="emergency-btn" id="emergencyBtn"><i class="fas fa-plus-circle"></i> Emergency</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="main-panel" role="main">
+        <div>
+            <div class="page-title">Healthcare Intelligence — Overview</div>
+            <div class="page-sub">Consultation, Pharmacy, Diagnostics, Analytics and AI Assistant — integrated view</div>
+        </div>
+
+        <div class="layout-grid" aria-live="polite">
+            <!-- Clinical KPI -->
+            <div class="card">
+                <h3>Patient Volume (Live)</h3>
+                <canvas id="patientVolumeChart"></canvas>
+            </div>
+
+            <!-- Operational KPI -->
+            <div class="card">
+                <h3>Staff Productivity</h3>
+                <canvas id="staffProductivityChart"></canvas>
+            </div>
+
+            <!-- Financial KPI -->
+            <div class="card">
+                <h3>Revenue by Department</h3>
+                <canvas id="revenueByDepartmentChart"></canvas>
+            </div>
+
+            <!-- Full width analytics area -->
+            <div class="card fullwidth">
+                <h3>Treatment Outcomes by Specialty</h3>
+                <canvas id="treatmentOutcomesChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h3>Resource Utilization</h3>
+                <canvas id="resourceUtilizationChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h3>Insurance Claims Processing</h3>
+                <canvas id="insuranceClaimsChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI assistant floating button -->
+    <div class="ai-assistant" id="aiAssistant" title="Open AI Assistant"><i class="fas fa-robot"></i></div>
+
+    <!-- Status bar -->
+    <div class="status-bar" role="status">
+        <div class="status-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--emerald);display:inline-block;margin-right:.5rem;"></span> System Online</div>
+        <div class="status-item"><span style="width:10px;height:10px;border-radius:50%;background:var(--neural-purple);display:inline-block;margin-right:.5rem;"></span> AI Active</div>
+    </div>
+
+    <script>
+        /* ---------------------------
+           Three.js neural background
+           --------------------------- */
+        let scene, camera, renderer, controls, universeGroup;
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0f2b);
+            scene.fog = new THREE.Fog(0x0a0f2b, 60, 200);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 90);
+
+            renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('three-container').appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; controls.dampingFactor = 0.04;
+            controls.autoRotate = true; controls.autoRotateSpeed = 0.25;
+            controls.minDistance = 40; controls.maxDistance = 220;
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambient);
+            const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(10,10,10); scene.add(dir);
+            const point = new THREE.PointLight(0x1a56db, 0.9, 200); scene.add(point);
+
+            universeGroup = new THREE.Group(); scene.add(universeGroup);
+
+            // Build 5 layers x 12 nodes per layer
+            const layers = 5, nodesPer = 12, spacing = 9;
+            for(let L=0; L<layers; L++){
+                const g = new THREE.Group();
+                const R = 14 + L*spacing;
+                for(let i=0;i<nodesPer;i++){
+                    const angle = (i/nodesPer) * Math.PI * 2;
+                    const x = Math.cos(angle)*R; const y = Math.sin(angle)*R; const z = (Math.random()-0.5)*8;
+                    const geom = new THREE.SphereGeometry(0.9, 12, 8);
+                    const mat = new THREE.MeshPhongMaterial({
+                        color: L%2===0?0x1a56db:0x7c3aed,
+                        emissive: L%2===0?0x1a56db:0x7c3aed,
+                        emissiveIntensity:0.08, shininess:80
+                    });
+                    const node = new THREE.Mesh(geom, mat);
+                    node.position.set(x,y,z);
+                    g.add(node);
+                }
+                universeGroup.add(g);
+
+                // connect to previous layer
+                if(L>0){
+                    const prevR = 14 + (L-1)*spacing;
+                    for(let i=0;i<nodesPer;i++){
+                        const a1 = (i/nodesPer)*Math.PI*2; const x1=Math.cos(a1)*prevR; const y1=Math.sin(a1)*prevR;
+                        for(let k=0;k<3;k++){
+                            const tIndex = (i+k)%nodesPer; const a2=(tIndex/nodesPer)*Math.PI*2; const x2=Math.cos(a2)*R; const y2=Math.sin(a2)*R;
+                            const pts = [ new THREE.Vector3(x1,y1,0), new THREE.Vector3(x2,y2,0) ];
+                            const geom = new THREE.BufferGeometry().setFromPoints(pts);
+                            const mat = new THREE.LineBasicMaterial({ color:0x1a56db, transparent:true, opacity:0.12 });
+                            const line = new THREE.Line(geom, mat); universeGroup.add(line);
+                        }
+                    }
+                }
+            }
+
+            // Particles
+            const particleCount = 400;
+            const positions = new Float32Array(particleCount*3);
+            const colors = new Float32Array(particleCount*3);
+            for(let i=0;i<particleCount;i++){
+                const radius = 12 + Math.random()*60;
+                const theta = Math.random()*Math.PI*2;
+                const phi = Math.acos(2*Math.random()-1);
+                const x = radius*Math.sin(phi)*Math.cos(theta);
+                const y = radius*Math.sin(phi)*Math.sin(theta);
+                const z = radius*Math.cos(phi);
+                positions[i*3]=x; positions[i*3+1]=y; positions[i*3+2]=z;
+                const c = new THREE.Color();
+                c.setHSL(radius<35?0.6:0.8,0.75,0.6);
+                colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b;
+            }
+            const pg = new THREE.BufferGeometry();
+            pg.setAttribute('position', new THREE.BufferAttribute(positions,3));
+            pg.setAttribute('color', new THREE.BufferAttribute(colors,3));
+            const pm = new THREE.PointsMaterial({ size:0.45, vertexColors:true, transparent:true, opacity:0.85, sizeAttenuation:true });
+            const points = new THREE.Points(pg, pm); universeGroup.add(points);
+
+            animate();
+            window.addEventListener('resize', onResize);
+        }
+
+        function animate(){
+            requestAnimationFrame(animate);
+            if(universeGroup){
+                universeGroup.rotation.y += 0.0012;
+                universeGroup.rotation.x += 0.0006;
+            }
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        function onResize(){
+            camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        /* ---------------------------
+           Chart.js analytics init
+           --------------------------- */
+        function createGradient(ctx, c1, c2){
+            const g = ctx.createLinearGradient(0,0,0,300); g.addColorStop(0,c1); g.addColorStop(1,c2); return g;
+        }
+
+        function initCharts(){
+            // Patient Volume (line, streaming demo)
+            const pvCtx = document.getElementById('patientVolumeChart').getContext('2d');
+            const pvGradient = createGradient(pvCtx, 'rgba(59,130,246,0.28)', 'rgba(124,58,237,0.04)');
+            const patientVolumeChart = new Chart(pvCtx, {
+                type:'line',
+                data:{ labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], datasets:[{label:'Patient Volume', data:[1200,1900,1500,2100,1800,2400,2200,2600,2300,2800,2500,3000], backgroundColor:pvGradient, borderColor:'#3b82f6', fill:true, tension:0.4}] },
+                options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ color: '#94a3b8' }, grid:{ color:'rgba(255,255,255,0.04)' } }, x:{ ticks:{ color:'#94a3b8' } } }, plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:'rgba(6,10,28,0.95)', titleColor:'#fff', bodyColor:'#e6eef8' } } }
+            });
+            // streaming demo update
+            setInterval(()=> {
+                const next = 2200 + Math.round((Math.random()-0.5)*700);
+                patientVolumeChart.data.labels.push(new Date().toLocaleTimeString().replace(/:\d+ /,' '));
+                patientVolumeChart.data.datasets[0].data.push(next);
+                if(patientVolumeChart.data.labels.length>24){ patientVolumeChart.data.labels.shift(); patientVolumeChart.data.datasets[0].data.shift(); }
+                patientVolumeChart.update('quiet');
+            }, 8000);
+
+            // Staff Productivity (bar)
+            const spCtx = document.getElementById('staffProductivityChart').getContext('2d');
+            new Chart(spCtx, { type:'bar', data:{ labels:['Cardio','Ortho','OPD','Lab','Pharmacy'], datasets:[{ data:[78,85,74,82,69], backgroundColor:['#3b82f6','#8b5cf6','#10b981','#f59e0b','#7c3aed'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ color:'#94a3b8' } }, x:{ ticks:{ color:'#94a3b8' } } } } });
+
+            // Revenue by Department
+            const revCtx = document.getElementById('revenueByDepartmentChart').getContext('2d');
+            new Chart(revCtx, { type:'bar', data:{ labels:['Cardio','Ortho','ENT','OPD'], datasets:[{ data:[125000,98000,76000,110000], backgroundColor:'#3b82f6' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ tooltip:{ callbacks:{ label: ctx => '₹' + Number(ctx.raw).toLocaleString('en-IN') } } } } });
+
+            // Treatment outcomes (stacked bar)
+            const toCtx = document.getElementById('treatmentOutcomesChart').getContext('2d');
+            new Chart(toCtx, {
+                type:'bar',
+                data:{
+                    labels:['Cardio','Neuro','Ortho','ENT','Derm'],
+                    datasets:[
+                        { label:'Recovered %', data:[65,60,72,68,70], backgroundColor:'#10b981' },
+                        { label:'Improved %', data:[20,25,15,18,16], backgroundColor:'#3b82f6' },
+                        { label:'Complications %', data:[15,15,13,14,14], backgroundColor:'#ef4444' }
+                    ]
+                },
+                options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#94a3b8' } } }, scales:{ y:{ ticks:{ color:'#94a3b8' } }, x:{ ticks:{ color:'#94a3b8' } } } }
+            });
+
+            // Resource utilization (doughnut)
+            const ruCtx = document.getElementById('resourceUtilizationChart').getContext('2d');
+            new Chart(ruCtx, { type:'doughnut', data:{ labels:['Beds','Ventilators','ICU','Lab Machines'], datasets:[{ data:[72,55,40,65], backgroundColor:['#3b82f6','#7c3aed','#ef4444','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false } });
+
+            // Insurance claims processing
+            const icCtx = document.getElementById('insuranceClaimsChart').getContext('2d');
+            new Chart(icCtx, { type:'bar', data:{ labels:['Approved','Rejected','Pending'], datasets:[{ data:[320,45,87], backgroundColor:['#10b981','#ef4444','#f59e0b'] }] }, options:{ responsive:true, maintainAspectRatio:false } });
+        }
+
+        /* ---------------------------
+           Interaction bindings
+           --------------------------- */
+        document.addEventListener('DOMContentLoaded', function(){
+            // init 3D then charts
+            initThreeJS();
+            // Delay chart init slightly so UI is ready (renderer uses GPU)
+            setTimeout(initCharts, 600);
+
+            // Emergency
+            document.getElementById('emergencyBtn').addEventListener('click', ()=> alert('Emergency protocol activated.'));
+
+            // AI assistant open (stub)
+            document.getElementById('aiAssistant').addEventListener('click', ()=> alert('MediVerse.AI Assistant: How can I help?'));
+
+            // quick nav clicks that could be wired to overlays/pages
+            document.getElementById('findDoctorsLink').addEventListener('click', (e)=> { e.preventDefault(); window.open('find-doctors.html','_self'); });
+            document.getElementById('videoConsultLink').addEventListener('click', (e)=> { e.preventDefault(); window.open('video-consult.html','_self'); });
+            document.getElementById('appointmentsLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open Appointments panel (implement)'); });
+
+            document.getElementById('eprescriptionsLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open E-Prescriptions (implement)'); });
+            document.getElementById('deliveryLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open Medicine Delivery (implement)'); });
+            document.getElementById('orderHistoryLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open Order History (implement)'); });
+
+            document.getElementById('labTestsLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open Lab Tests (implement)'); });
+            document.getElementById('reportsLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open Reports (implement)'); });
+            document.getElementById('homeCollectionLink').addEventListener('click', (e)=> { e.preventDefault(); alert('Open Home Collection (implement)'); });
+
+            // nav active toggle
+            document.querySelectorAll('.nav-link').forEach(l=>{
+                l.addEventListener('click', (ev)=>{
+                    ev.preventDefault();
+                    document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active'));
+                    l.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

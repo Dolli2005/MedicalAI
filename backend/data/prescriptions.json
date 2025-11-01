@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "patientName": "John Doe",
+    "medicines": [
+      { "name": "Paracetamol", "dose": "500mg", "frequency": "twice a day" }
+    ],
+    "notes": "Take after food",
+    "createdAt": "2025-10-31T00:00:00.000Z"
+  }
+]

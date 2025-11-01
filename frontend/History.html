@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Services | MediVerse.AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary-blue: #1a56db;
+            --dark-blue: #0f172a;
+            --midnight: #0a0f2b;
+            --slate: #64748b;
+            --light-slate: #94a3b8;
+            --platinum: #f8fafc;
+            --emerald: #059669;
+            --crimson: #dc2626;
+            --amber: #d97706;
+            --neural-purple: #7c3aed;
+            --predictive-orange: #f59e0b;
+            --clinical-green: #10b981;
+            --operational-blue: #3b82f6;
+            --financial-purple: #8b5cf6;
+            --ayurveda-gold: #d97706;
+            --traditional-teal: #0d9488;
+        }
+
+        body {
+            background: var(--midnight);
+            color: var(--platinum);
+            overflow-x: hidden;
+            font-weight: 300;
+        }
+
+        /* Professional Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--platinum);
+        }
+
+        .logo-icon {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--light-slate);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--platinum);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+            background: rgba(26, 86, 219, 0.1);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .emergency-btn {
+            background: var(--crimson);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .emergency-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        /* Pharmacy Page Styles */
+        .pharmacy-container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--platinum) 0%, var(--primary-blue) 50%, var(--neural-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--light-slate);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--light-slate);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Medicine Delivery Section */
+        .delivery-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header i {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .delivery-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .delivery-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .delivery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-blue);
+        }
+
+        .delivery-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .delivery-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--operational-blue);
+        }
+
+        .delivery-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .delivery-description {
+            color: var(--light-slate);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .delivery-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .delivery-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--light-slate);
+        }
+
+        .delivery-features li i {
+            color: var(--emerald);
+            font-size: 0.8rem;
+        }
+
+        .delivery-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--platinum);
+        }
+
+        .delivery-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .delivery-btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+        }
+
+        /* Order Tracking */
+        .tracking-section {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tracking-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tracking-input {
+            flex: 1;
+            padding: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .tracking-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.2);
+        }
+
+        .tracking-btn {
+            padding: 0.875rem 2rem;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tracking-btn:hover {
+            background: #1e40af;
+        }
+
+        .tracking-progress {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .tracking-progress::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-icon.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            color: var(--light-slate);
+            text-align: center;
+        }
+
+        .step-label.active {
+            color: var(--platinum);
+            font-weight: 500;
+        }
+
+        /* Order History Section */
+        .order-history {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light-slate);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .orders-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .order-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-blue);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: var(--platinum);
+        }
+
+        .order-date {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-delivered {
+            background: rgba(5, 150, 105, 0.2);
+            color: var(--emerald);
+        }
+
+        .status-processing {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--amber);
+        }
+
+        .status-shipped {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--operational-blue);
+        }
+
+        .status-cancelled {
+            background: rgba(220, 38, 38, 0.2);
+            color: var(--crimson);
+        }
+
+        .order-items {
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .item-name {
+            color: var(--platinum);
+        }
+
+        .item-quantity {
+            color: var(--light-slate);
+        }
+
+        .item-price {
+            color: var(--platinum);
+            font-weight: 500;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .order-total {
+            font-weight: 600;
+            color: var(--platinum);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light-slate);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(26, 86, 219, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: var(--emerald); }
+        .status-warning { background: var(--amber); }
+        .status-offline { background: var(--crimson); }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .delivery-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .tracking-form {
+                flex-direction: column;
+            }
+            
+            .order-filters {
+                flex-direction: column;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1e40af;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Indian Currency */
+        .inr-symbol {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>MediVerse.AI</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-stethoscope"></i>
+                        Consultation
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="pharmacy.html" class="nav-link active">
+                        <i class="fas fa-pills"></i>
+                        Pharmacy
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-microscope"></i>
+                        Diagnostics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-robot"></i>
+                        AI Assistant
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="analytics.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Analytics
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="emergency-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Emergency
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Pharmacy Page Content -->
+    <div class="pharmacy-container">
+        <div class="page-header">
+            <h1 class="page-title">Pharmacy & Medicine Delivery</h1>
+            <p class="page-subtitle">Advanced AI-powered medicine delivery system with real-time tracking and comprehensive order management</p>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="delivery">Medicine Delivery</button>
+            <button class="tab-btn" data-tab="tracking">Order Tracking</button>
+            <button class="tab-btn" data-tab="history">Order History</button>
+            <button class="tab-btn" data-tab="prescriptions">E-Prescriptions</button>
+        </div>
+
+        <!-- Medicine Delivery Tab -->
+        <div class="tab-content active" id="delivery-tab">
+            <div class="delivery-section">
+                <div class="section-header">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h2>Advanced Medicine Delivery Options</h2>
+                </div>
+                
+                <div class="delivery-options">
+                    <div class="delivery-card fade-in-up">
+                        <div class="delivery-card-header">
+                            <div class="delivery-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="delivery-title">Express Delivery</div>
+                        </div>
+                        <div class="delivery-description">
+                            Get your medicines delivered within 2 hours. Priority handling with real-time GPS tracking and AI-optimized routes.
+                        </div>
+                        <ul class="delivery-features">
+                            <li><i class="fas fa-check"></i> 2-hour delivery guarantee</li>
+                            <li><i class="fas fa-check"></i> Real-time GPS tracking</li>
+                            <li><i class="fas fa-check"></i> Temperature-controlled packaging</li>
+                            <li><i class="fas fa-check"></i> AI-optimized delivery routes</li>
+                            <li><i class="fas fa-check"></i> Priority customer support</li>
+                        </ul>
+                        <div class="delivery-price">₹99 <span style="font-size: 0.9rem; color: var(--light-slate);">per delivery</span></div>
+                        <button class="delivery-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            Select Express Delivery
+                        </button>
+                    </div>
+
+                    <div class="delivery-card fade-in-up">
+                        <div class="delivery-card-header">
+                            <div class="delivery-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="delivery-title">Same Day Delivery</div>
+                        </div>
+                        <div class="delivery-description">
+                            Receive your order within the same day. Perfect for non-urgent prescriptions with flexible delivery windows.
+                        </div>
+                        <ul class="delivery-features">
+                            <li><i class="fas fa-check"></i> Same-day delivery</li>
+                            <li><i class="fas fa-check"></i> 4-hour delivery windows</li>
+                            <li><i class="fas fa-check"></i> Temperature monitoring</li>
+                            <li><i class="fas fa-check"></i> SMS/Email notifications</li>
+                            <li><i class="fas fa-check"></i> Contactless delivery option</li>
+                        </ul>
+                        <div class="delivery-price">₹49 <span style="font-size: 0.9rem; color: var(--light-slate);">per delivery</span></div>
+                        <button class="delivery-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            Select Same Day Delivery
+                        </button>
+                    </div>
+
+                    <div class="delivery-card fade-in-up">
+                        <div class="delivery-card-header">
+                            <div class="delivery-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="delivery-title">Scheduled Delivery</div>
+                        </div>
+                        <div class="delivery-description">
+                            Plan your medicine deliveries in advance. Perfect for chronic medication management with automated refills.
+                        </div>
+                        <ul class="delivery-features">
+                            <li><i class="fas fa-check"></i> Choose delivery date & time</li>
+                            <li><i class="fas fa-check"></i> Automated refill reminders</li>
+                            <li><i class="fas fa-check"></i> Subscription discounts</li>
+                            <li><i class="fas fa-check"></i> Family medication management</li>
+                            <li><i class="fas fa-check"></i> Bulk order discounts</li>
+                        </ul>
+                        <div class="delivery-price">₹29 <span style="font-size: 0.9rem; color: var(--light-slate);">per delivery</span></div>
+                        <button class="delivery-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            Select Scheduled Delivery
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h2>Delivery Address</h2>
+                </div>
+                
+                <div class="address-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--light-slate);">Full Name</label>
+                            <input type="text" class="tracking-input" placeholder="Enter your full name" value="Rajesh Kumar">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--light-slate);">Phone Number</label>
+                            <input type="text" class="tracking-input" placeholder="Enter phone number" value="+91 98765 43210">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--light-slate);">Address</label>
+                        <input type="text" class="tracking-input" placeholder="Enter your address" value="A-102, Skyline Apartments, Bandra West">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--light-slate);">City</label>
+                            <input type="text" class="tracking-input" placeholder="City" value="Mumbai">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--light-slate);">State</label>
+                            <input type="text" class="tracking-input" placeholder="State" value="Maharashtra">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--light-slate);">PIN Code</label>
+                            <input type="text" class="tracking-input" placeholder="PIN Code" value="400050">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Tracking Tab -->
+        <div class="tab-content" id="tracking-tab">
+            <div class="tracking-section">
+                <div class="section-header">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h2>Real-Time Order Tracking</h2>
+                </div>
+                
+                <div class="tracking-form">
+                    <input type="text" class="tracking-input" placeholder="Enter your Order ID" value="MV-2023-0876">
+                    <button class="tracking-btn">
+                        <i class="fas fa-search"></i>
+                        Track Order
+                    </button>
+                </div>
+                
+                <div class="tracking-progress">
+                    <div class="progress-step">
+                        <div class="step-icon active">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-label active">Order Placed</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-icon active">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-label active">Processing</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-icon active">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="step-label active">Quality Check</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-icon active">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="step-label active">Out for Delivery</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="step-label">Delivered</div>
+                    </div>
+                </div>
+                
+                <div class="delivery-map" style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; height: 300px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                    <div style="text-align: center;">
+                        <i class="fas fa-map-marked-alt" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--light-slate);">Live GPS Tracking Active</p>
+                        <p style="color: var(--platinum); font-weight: 500; margin-top: 0.5rem;">Delivery Partner: Rahul • 5.2 km away</p>
+                        <p style="color: var(--light-slate); font-size: 0.9rem; margin-top: 0.5rem;">Estimated Delivery: 25 minutes</p>
+                    </div>
+                </div>
+                
+                <div class="delivery-details" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--light-slate); font-size: 0.9rem;">Order ID</div>
+                        <div style="color: var(--platinum); font-weight: 500;">MV-2023-0876</div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--light-slate); font-size: 0.9rem;">Order Date</div>
+                        <div style="color: var(--platinum); font-weight: 500;">Nov 15, 2023</div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--light-slate); font-size: 0.9rem;">Delivery Type</div>
+                        <div style="color: var(--platinum); font-weight: 500;">Express Delivery</div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--light-slate); font-size: 0.9rem;">Delivery Partner</div>
+                        <div style="color: var(--platinum); font-weight: 500;">Rahul (4.9 ★)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History Tab -->
+        <div class="tab-content" id="history-tab">
+            <div class="order-history">
+                <div class="section-header">
+                    <i class="fas fa-history"></i>
+                    <h2>Order History & Analytics</h2>
+                </div>
+                
+                <div class="order-filters">
+                    <button class="filter-btn active">All Orders</button>
+                    <button class="filter-btn">Last 30 Days</button>
+                    <button class="filter-btn">Last 3 Months</button>
+                    <button class="filter-btn">2023</button>
+                    <button class="filter-btn">Prescription Orders</button>
+                </div>
+                
+                <div class="orders-grid">
+                    <div class="order-card fade-in-up">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-id">MV-2023-0876</div>
+                                <div class="order-date">Nov 15, 2023 • Express Delivery</div>
+                            </div>
+                            <div class="order-status status-shipped">Out for Delivery</div>
+                        </div>
+                        <div class="order-items">
+                            <div class="order-item">
+                                <div class="item-name">Atorvastatin 20mg</div>
+                                <div class="item-quantity">30 tablets</div>
+                                <div class="item-price">₹450</div>
+                            </div>
+                            <div class="order-item">
+                                <div class="item-name">Metformin 500mg</div>
+                                <div class="item-quantity">60 tablets</div>
+                                <div class="item-price">₹320</div>
+                            </div>
+                            <div class="order-item">
+                                <div class="item-name">Vitamin D3 60K IU</div>
+                                <div class="item-quantity">4 tablets</div>
+                                <div class="item-price">₹180</div>
+                            </div>
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">Total: ₹950</div>
+                            <div class="order-actions">
+                                <button class="action-btn">Track</button>
+                                <button class="action-btn">Reorder</button>
+                                <button class="action-btn">Details</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-card fade-in-up">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-id">MV-2023-0821</div>
+                                <div class="order-date">Nov 8, 2023 • Scheduled Delivery</div>
+                            </div>
+                            <div class="order-status status-delivered">Delivered</div>
+                        </div>
+                        <div class="order-items">
+                            <div class="order-item">
+                                <div class="item-name">Losartan 50mg</div>
+                                <div class="item-quantity">30 tablets</div>
+                                <div class="item-price">₹280</div>
+                            </div>
+                            <div class="order-item">
+                                <div class="item-name">Aspirin 75mg</div>
+                                <div class="item-quantity">30 tablets</div>
+                                <div class="item-price">₹120</div>
+                            </div>
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">Total: ₹400</div>
+                            <div class="order-actions">
+                                <button class="action-btn">Reorder</button>
+                                <button class="action-btn">Invoice</button>
+                                <button class="action-btn">Details</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-card fade-in-up">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-id">MV-2023-0765</div>
+                                <div class="order-date">Oct 28, 2023 • Same Day Delivery</div>
+                            </div>
+                            <div class="order-status status-delivered">Delivered</div>
+                        </div>
+                        <div class="order-items">
+                            <div class="order-item">
+                                <div class="item-name">Amoxicillin 500mg</div>
+                                <div class="item-quantity">10 capsules</div>
+                                <div class="item-price">₹150</div>
+                            </div>
+                            <div class="order-item">
+                                <div class="item-name">Paracetamol 500mg</div>
+                                <div class="item-quantity">15 tablets</div>
+                                <div class="item-price">₹40</div>
+                            </div>
+                            <div class="order-item">
+                                <div class="item-name">Cetirizine 10mg</div>
+                                <div class="item-quantity">10 tablets</div>
+                                <div class="item-price">₹35</div>
+                            </div>
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">Total: ₹225</div>
+                            <div class="order-actions">
+                                <button class="action-btn">Reorder</button>
+                                <button class="action-btn">Invoice</button>
+                                <button class="action-btn">Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="order-analytics" style="margin-top: 2rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 1.5rem;">
+                    <div class="section-header">
+                        <i class="fas fa-chart-bar"></i>
+                        <h2>Order Analytics</h2>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--primary-blue);">12</div>
+                            <div style="color: var(--light-slate);">Total Orders</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--emerald);">₹8,450</div>
+                            <div style="color: var(--light-slate);">Total Spent</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--amber);">4</div>
+                            <div style="color: var(--light-slate);">Prescription Orders</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--neural-purple);">92%</div>
+                            <div style="color: var(--light-slate);">On-time Delivery</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- E-Prescriptions Tab -->
+        <div class="tab-content" id="prescriptions-tab">
+            <div class="delivery-section">
+                <div class="section-header">
+                    <i class="fas fa-prescription"></i>
+                    <h2>E-Prescriptions Management</h2>
+                </div>
+                
+                <div class="delivery-options">
+                    <div class="delivery-card fade-in-up">
+                        <div class="delivery-card-header">
+                            <div class="delivery-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="delivery-title">Upload Prescription</div>
+                        </div>
+                        <div class="delivery-description">
+                            Upload your doctor's prescription and our AI system will automatically extract medication details for quick processing.
+                        </div>
+                        <div style="border: 2px dashed rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 1.5rem;">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--light-slate); margin-bottom: 1rem;"></i>
+                            <p style="color: var(--light-slate);">Drag & drop your prescription or <span style="color: var(--primary-blue); cursor: pointer;">browse files</span></p>
+                            <p style="color: var(--slate); font-size: 0.8rem; margin-top: 0.5rem;">Supports JPG, PNG, PDF (Max 10MB)</p>
+                        </div>
+                        <button class="delivery-btn">
+                            <i class="fas fa-upload"></i>
+                            Upload Prescription
+                        </button>
+                    </div>
+
+                    <div class="delivery-card fade-in-up">
+                        <div class="delivery-card-header">
+                            <div class="delivery-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="delivery-title">Scan Prescription</div>
+                        </div>
+                        <div class="delivery-description">
+                            Use your phone camera to scan the prescription. Our AI will recognize and process the medication information instantly.
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 1.5rem;">
+                            <i class="fas fa-camera" style="font-size: 2rem; color: var(--light-slate); margin-bottom: 1rem;"></i>
+                            <p style="color: var(--light-slate);">Scan prescription with your camera</p>
+                        </div>
+                        <button class="delivery-btn">
+                            <i class="fas fa-camera"></i>
+                            Open Camera Scanner
+                        </button>
+                    </div>
+
+                    <div class="delivery-card fade-in-up">
+                        <div class="delivery-card-header">
+                            <div class="delivery-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div class="delivery-title">Digital Prescriptions</div>
+                        </div>
+                        <div class="delivery-description">
+                            Access your digital prescriptions from connected healthcare providers. Securely stored and ready for fulfillment.
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                                <div style="color: var(--platinum); font-weight: 500;">Dr. Sharma - Cardiology</div>
+                                <div style="color: var(--light-slate); font-size: 0.8rem;">Oct 15, 2023</div>
+                            </div>
+                            <div style="color: var(--light-slate); font-size: 0.9rem;">Atorvastatin 20mg, Aspirin 75mg</div>
+                        </div>
+                        <button class="delivery-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            Order from Prescription
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-dot status-online"></div>
+            <span>Pharmacy Online</span>
+        </div>
+        <div class="status-item">
+            <div class="status-dot status-online"></div>
+            <span>Delivery Network Active</span>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = btn.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Filter buttons functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Delivery option buttons
+        document.querySelectorAll('.delivery-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.delivery-card');
+                const title = card.querySelector('.delivery-title').textContent;
+                alert(`Selected: ${title}\nProceeding to order summary...`);
+            });
+        });
+        
+        // Action buttons in order history
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent;
+                const orderId = this.closest('.order-card').querySelector('.order-id').textContent;
+                
+                if (action === 'Track') {
+                    // Switch to tracking tab and populate the order ID
+                    document.querySelector('[data-tab="tracking"]').click();
+                    document.querySelector('.tracking-input').value = orderId;
+                } else if (action === 'Reorder') {
+                    alert(`Reordering medicines from ${orderId}`);
+                } else if (action === 'Details') {
+                    alert(`Showing detailed information for ${orderId}`);
+                } else if (action === 'Invoice') {
+                    alert(`Generating invoice for ${orderId}`);
+                }
+            });
+        });
+        
+        // Tracking form submission
+        document.querySelector('.tracking-btn').addEventListener('click', function() {
+            const orderId = document.querySelector('.tracking-input').value;
+            if (orderId) {
+                alert(`Tracking order: ${orderId}\nLive tracking data loaded.`);
+            } else {
+                alert('Please enter an Order ID to track');
+            }
+        });
+        
+        // AI Assistant
+        document.querySelector('.ai-assistant').addEventListener('click', function() {
+            alert('Pharmacy AI Assistant: "I can help you with medicine information, delivery options, and prescription management. How can I assist you today?"');
+        });
+        
+        // Emergency button
+        document.querySelector('.emergency-btn').addEventListener('click', function() {
+            alert('Emergency protocol activated. Connecting you with emergency medical services and preparing emergency medication kit for delivery.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Prescriptions | MediVerse.AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary-blue: #1a56db;
+            --dark-blue: #0f172a;
+            --midnight: #0a0f2b;
+            --slate: #64748b;
+            --light-slate: #94a3b8;
+            --platinum: #f8fafc;
+            --emerald: #059669;
+            --crimson: #dc2626;
+            --amber: #d97706;
+            --neural-purple: #7c3aed;
+        }
+
+        body {
+            background: var(--midnight);
+            color: var(--platinum);
+            overflow-x: hidden;
+            font-weight: 300;
+        }
+
+        /* Professional Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--platinum);
+        }
+
+        .logo-icon {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--light-slate);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--platinum);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+            background: rgba(26, 86, 219, 0.1);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            min-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--light-slate);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--platinum);
+        }
+
+        .dropdown-icon {
+            width: 20px;
+            text-align: center;
+            color: var(--primary-blue);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .emergency-btn {
+            background: var(--crimson);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .emergency-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        /* E-Prescription Page Styles */
+        .prescription-container {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--platinum) 0%, var(--primary-blue) 50%, var(--neural-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--light-slate);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--light-slate);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Prescription Cards */
+        .prescriptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .prescription-card {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .prescription-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-blue);
+        }
+
+        .prescription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .prescription-id {
+            font-size: 0.9rem;
+            color: var(--light-slate);
+        }
+
+        .prescription-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--emerald);
+        }
+
+        .status-completed {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--slate);
+        }
+
+        .status-expired {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--crimson);
+        }
+
+        .prescription-doctor {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .doctor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .doctor-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .doctor-info p {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        .medication-list {
+            margin-bottom: 1.5rem;
+        }
+
+        .medication-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .medication-name {
+            font-weight: 500;
+        }
+
+        .medication-dosage {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        .prescription-details {
+            display: flex;
+            justify-content: space-between;
+            color: var(--light-slate);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .prescription-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #1e40af;
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--platinum);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Detailed Prescription View */
+        .prescription-detail-view {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+        }
+
+        .patient-info-grid, .doctor-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--light-slate);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .medications-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .medications-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light-slate);
+            font-weight: 500;
+        }
+
+        .medications-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .medication-frequency {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .frequency-badge {
+            background: rgba(26, 86, 219, 0.2);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .instructions-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .instructions-list {
+            list-style-type: none;
+        }
+
+        .instructions-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .instructions-list li:before {
+            content: "•";
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        /* AI Recommendations */
+        .ai-recommendations {
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-header i {
+            color: var(--neural-purple);
+            font-size: 1.5rem;
+        }
+
+        .ai-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .recommendation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .recommendation-item i {
+            color: var(--neural-purple);
+            margin-top: 0.2rem;
+        }
+
+        .recommendation-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Pharmacy Integration */
+        .pharmacy-integration {
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+
+        .pharmacy-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .pharmacy-header i {
+            color: var(--emerald);
+            font-size: 1.5rem;
+        }
+
+        .pharmacy-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .pharmacy-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pharmacy-option {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pharmacy-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .pharmacy-option i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--emerald);
+        }
+
+        .pharmacy-option h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .pharmacy-option p {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--light-slate);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--slate);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(26, 86, 219, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: var(--emerald); }
+        .status-warning { background: var(--amber); }
+        .status-offline { background: var(--crimson); }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .prescriptions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-actions {
+                flex-direction: column;
+            }
+            
+            .pharmacy-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>MediVerse.AI</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Appointment.html" class="nav-link">
+                        <i class="fas fa-calendar-check"></i>
+                        Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="finddoc.html" class="nav-link">
+                        <i class="fas fa-user-md"></i>
+                        Find Doctor
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="EPrescription.html" class="nav-link active">
+                        <i class="fas fa-prescription"></i>
+                        E-Prescription
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Diagnotics.html" class="nav-link">
+                        <i class="fas fa-microscope"></i>
+                        Diagnostics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="Videocall.html" class="nav-link">
+                        <i class="fas fa-video"></i>
+                        Video Call
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="History.html" class="nav-link">
+                        <i class="fas fa-history"></i>
+                        History
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="emergency-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Emergency
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back Button -->
+    <button class="back-btn" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+
+    <!-- E-Prescription Page Content -->
+    <div class="prescription-container">
+        <div class="page-header">
+            <h1 class="page-title">E-Prescriptions</h1>
+            <p class="page-subtitle">Manage your digital prescriptions with AI-powered insights and pharmacy integration</p>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="all">All Prescriptions</button>
+            <button class="tab-btn" data-tab="active">Active</button>
+            <button class="tab-btn" data-tab="completed">Completed</button>
+            <button class="tab-btn" data-tab="expired">Expired</button>
+        </div>
+
+        <!-- All Prescriptions Tab -->
+        <div class="tab-content active" id="all-tab">
+            <div class="prescriptions-grid">
+                <!-- Prescription Card 1 -->
+                <div class="prescription-card" data-prescription-id="RX-2023-0876">
+                    <div class="prescription-header">
+                        <div class="prescription-id">#RX-2023-0876</div>
+                        <div class="prescription-status status-active">Active</div>
+                    </div>
+
+                    <div class="prescription-doctor">
+                        <div class="doctor-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. Priya Sharma</h3>
+                            <p>Cardiologist • MBBS, MD</p>
+                        </div>
+                    </div>
+
+                    <div class="medication-list">
+                        <div class="medication-item">
+                            <div>
+                                <div class="medication-name">Atorvastatin</div>
+                                <div class="medication-dosage">20mg Tablet</div>
+                            </div>
+                            <div class="medication-frequency">
+                                <span class="frequency-badge">1-0-0</span>
+                            </div>
+                        </div>
+                        <div class="medication-item">
+                            <div>
+                                <div class="medication-name">Metoprolol</div>
+                                <div class="medication-dosage">25mg Tablet</div>
+                            </div>
+                            <div class="medication-frequency">
+                                <span class="frequency-badge">0-0-1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prescription-details">
+                        <div>Issued: Nov 10, 2023</div>
+                        <div>Valid until: Dec 10, 2023</div>
+                    </div>
+
+                    <div class="prescription-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-shopping-cart"></i>
+                            Order
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prescription Card 2 -->
+                <div class="prescription-card" data-prescription-id="RX-2023-0921">
+                    <div class="prescription-header">
+                        <div class="prescription-id">#RX-2023-0921</div>
+                        <div class="prescription-status status-active">Active</div>
+                    </div>
+
+                    <div class="prescription-doctor">
+                        <div class="doctor-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. Rajesh Kumar</h3>
+                            <p>Neurologist • MBBS, DM</p>
+                        </div>
+                    </div>
+
+                    <div class="medication-list">
+                        <div class="medication-item">
+                            <div>
+                                <div class="medication-name">Topiramate</div>
+                                <div class="medication-dosage">50mg Tablet</div>
+                            </div>
+                            <div class="medication-frequency">
+                                <span class="frequency-badge">0-1-0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prescription-details">
+                        <div>Issued: Nov 5, 2023</div>
+                        <div>Valid until: Dec 5, 2023</div>
+                    </div>
+
+                    <div class="prescription-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-shopping-cart"></i>
+                            Order
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prescription Card 3 -->
+                <div class="prescription-card" data-prescription-id="RX-2023-0743">
+                    <div class="prescription-header">
+                        <div class="prescription-id">#RX-2023-0743</div>
+                        <div class="prescription-status status-completed">Completed</div>
+                    </div>
+
+                    <div class="prescription-doctor">
+                        <div class="doctor-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>Dr. Anjali Singh</h3>
+                            <p>Dermatologist • MBBS, MD</p>
+                        </div>
+                    </div>
+
+                    <div class="medication-list">
+                        <div class="medication-item">
+                            <div>
+                                <div class="medication-name">Clobetasol Cream</div>
+                                <div class="medication-dosage">0.05% Topical</div>
+                            </div>
+                            <div class="medication-frequency">
+                                <span class="frequency-badge">Twice Daily</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prescription-details">
+                        <div>Issued: Oct 15, 2023</div>
+                        <div>Valid until: Nov 15, 2023</div>
+                    </div>
+
+                    <div class="prescription-actions">
+                        <button class="action-btn primary">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-redo"></i>
+                            Renew
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Prescription View -->
+            <div class="prescription-detail-view" id="detail-view">
+                <div class="detail-header">
+                    <h2 class="detail-title">Prescription Details - #RX-2023-0876</h2>
+                    <div class="detail-actions">
+                        <button class="action-btn secondary">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
+                        <button class="action-btn secondary">
+                            <i class="fas fa-share-alt"></i>
+                            Share
+                        </button>
+                        <button class="action-btn primary">
+                            <i class="fas fa-shopping-cart"></i>
+                            Order Medicines
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Patient & Doctor Information -->
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user-injured"></i>
+                        Patient Information
+                    </h3>
+                    <div class="patient-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Full Name</span>
+                            <span class="info-value">Rahul Sharma</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Age & Gender</span>
+                            <span class="info-value">42 Years, Male</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Patient ID</span>
+                            <span class="info-value">PT-2023-0012</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Blood Group</span>
+                            <span class="info-value">B+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user-md"></i>
+                        Doctor Information
+                    </h3>
+                    <div class="doctor-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Doctor Name</span>
+                            <span class="info-value">Dr. Priya Sharma</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Specialization</span>
+                            <span class="info-value">Cardiology</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">License No.</span>
+                            <span class="info-value">MCI-123456</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Contact</span>
+                            <span class="info-value">clinic@dpriya.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medications -->
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-pills"></i>
+                        Prescribed Medications
+                    </h3>
+                    <table class="medications-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine Name</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th>Instructions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="medication-name">Atorvastatin</div>
+                                    <div class="medication-dosage">20mg Tablet</div>
+                                </td>
+                                <td>1 Tablet</td>
+                                <td>
+                                    <div class="medication-frequency">
+                                        <span class="frequency-badge">Morning</span>
+                                    </div>
+                                </td>
+                                <td>30 Days</td>
+                                <td>After food</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="medication-name">Metoprolol</div>
+                                    <div class="medication-dosage">25mg Tablet</div>
+                                </td>
+                                <td>1 Tablet</td>
+                                <td>
+                                    <div class="medication-frequency">
+                                        <span class="frequency-badge">Night</span>
+                                    </div>
+                                </td>
+                                <td>30 Days</td>
+                                <td>Before bedtime</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="medication-name">Aspirin</div>
+                                    <div class="medication-dosage">75mg Tablet</div>
+                                </td>
+                                <td>1 Tablet</td>
+                                <td>
+                                    <div class="medication-frequency">
+                                        <span class="frequency-badge">Morning</span>
+                                    </div>
+                                </td>
+                                <td>30 Days</td>
+                                <td>After breakfast</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Instructions -->
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-file-medical-alt"></i>
+                        Additional Instructions
+                    </h3>
+                    <div class="instructions-section">
+                        <ul class="instructions-list">
+                            <li>Take medications regularly as prescribed</li>
+                            <li>Monitor blood pressure daily and maintain record</li>
+                            <li>Follow up after 30 days for review</li>
+                            <li>Avoid high cholesterol diet</li>
+                            <li>Regular walking for 30 minutes daily</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- AI Recommendations -->
+                <div class="ai-recommendations">
+                    <div class="ai-header">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI Health Insights</h3>
+                    </div>
+                    <div class="recommendation-list">
+                        <div class="recommendation-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div class="recommendation-text">Based on your prescription, consider monitoring liver function tests while on Atorvastatin therapy.</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div class="recommendation-text">Metoprolol may cause dizziness - avoid sudden position changes and driving until you know how it affects you.</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div class="recommendation-text">Schedule a lipid profile test after 3 months to assess the effectiveness of cholesterol management.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pharmacy Integration -->
+                <div class="pharmacy-integration">
+                    <div class="pharmacy-header">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                        <h3>Get Your Medicines</h3>
+                    </div>
+                    <p>Order your prescribed medications with home delivery or pick up from nearby pharmacy</p>
+                    <div class="pharmacy-options">
+                        <div class="pharmacy-option">
+                            <i class="fas fa-truck"></i>
+                            <h4>Home Delivery</h4>
+                            <p>Get medicines delivered to your doorstep within 2 hours</p>
+                        </div>
+                        <div class="pharmacy-option">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h4>Pharmacy Pickup</h4>
+                            <p>Pick up from nearest pharmacy with digital prescription</p>
+                        </div>
+                        <div class="pharmacy-option">
+                            <i class="fas fa-calendar-check"></i>
+                            <h4>Auto Refill</h4>
+                            <p>Set up automatic refills for chronic medications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Prescriptions Tab -->
+        <div class="tab-content" id="active-tab">
+            <!-- Content would be filtered active prescriptions -->
+            <div class="empty-state">
+                <i class="fas fa-prescription"></i>
+                <h3>No Active Prescriptions</h3>
+                <p>You don't have any active prescriptions at the moment.</p>
+            </div>
+        </div>
+
+        <!-- Completed Prescriptions Tab -->
+        <div class="tab-content" id="completed-tab">
+            <!-- Content would be filtered completed prescriptions -->
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <h3>No Completed Prescriptions</h3>
+                <p>Your completed prescriptions will appear here.</p>
+            </div>
+        </div>
+
+        <!-- Expired Prescriptions Tab -->
+        <div class="tab-content" id="expired-tab">
+            <!-- Content would be filtered expired prescriptions -->
+            <div class="empty-state">
+                <i class="fas fa-clock"></i>
+                <h3>No Expired Prescriptions</h3>
+                <p>You don't have any expired prescriptions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item">
+            <div class="status-dot status-online"></div>
+            <span>System Online</span>
+        </div>
+        <div class="status-item">
+            <div class="status-dot status-online"></div>
+            <span>AI Neural Network Active</span>
+        </div>
+    </div>
+
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // E-Prescription functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load prescriptions on page load
+            loadPrescriptions();
+            // Tab switching
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Prescription card click to show details
+            const prescriptionCards = document.querySelectorAll('.prescription-card');
+            prescriptionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const prescriptionId = this.getAttribute('data-prescription-id');
+                    
+                    // In a real app, this would load specific prescription data
+                    loadPrescriptionDetails(prescriptionId);
+                    
+                    // Scroll to detail view
+                    document.getElementById('detail-view').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Order medicine buttons
+            const orderBtns = document.querySelectorAll('.action-btn.primary');
+            orderBtns.forEach(btn => {
+                if (btn.textContent.includes('Order')) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        alert('Redirecting to pharmacy ordering system...');
+                        // In a real app, this would redirect to ordering page
+                    });
+                }
+            });
+
+            // AI Assistant
+            document.querySelector('.ai-assistant').addEventListener('click', function() {
+                alert('AI Assistant: "I can help you understand your medications, set reminders, and provide drug interaction checks. How can I assist you today?"');
+            });
+
+            // Emergency button
+            document.querySelector('.emergency-btn').addEventListener('click', function() {
+                alert('Emergency protocol activated. Medical assistance is on the way.');
+            });
+
+            // Load all prescriptions from API
+            async function loadPrescriptions() {
+                try {
+                    const prescriptions = await prescriptionsApi.list();
+                    const prescriptionsGrid = document.querySelector('.prescriptions-grid');
+                    prescriptionsGrid.innerHTML = prescriptions.length ? '' : `
+                        <div class="empty-state">
+                            <i class="fas fa-prescription"></i>
+                            <h3>No Prescriptions Found</h3>
+                            <p>No prescriptions have been issued yet.</p>
+                        </div>
+                    `;
+                    
+                    prescriptions.forEach(prescription => {
+                        const card = createPrescriptionCard(prescription);
+                        prescriptionsGrid.appendChild(card);
+                    });
+                } catch (error) {
+                    showMessage('Failed to load prescriptions: ' + error.message, true);
+                }
+            }
+
+            // Create prescription card element
+            function createPrescriptionCard(prescription) {
+                const card = document.createElement('div');
+                card.className = 'prescription-card';
+                card.setAttribute('data-prescription-id', prescription.id);
+                
+                const medicines = prescription.medicines || [];
+                const medicationList = medicines.map(med => `
+                    <div class="medication-item">
+                        <div>
+                            <div class="medication-name">${med.name}</div>
+                            <div class="medication-dosage">${med.dose}</div>
+                        </div>
+                        <div class="medication-frequency">
+                            <span class="frequency-badge">${med.frequency}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                card.innerHTML = `
+                    <div class="prescription-header">
+                        <div class="prescription-id">#${prescription.id}</div>
+                        <div class="prescription-status status-${prescription.status || 'active'}">${prescription.status || 'Active'}</div>
+                    </div>
+                    <div class="prescription-doctor">
+                        <div class="doctor-avatar">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="doctor-info">
+                            <h3>${prescription.doctor || 'Unknown Doctor'}</h3>
+                            <p>${prescription.doctorSpecialty || ''}</p>
+                        </div>
+                    </div>
+                    <div class="medication-list">
+                        ${medicationList}
+                    </div>
+                    <div class="prescription-details">
+                        <div>Issued: ${formatDate(prescription.createdAt)}</div>
+                        <div>Valid until: ${prescription.validUntil ? formatDate(prescription.validUntil) : 'N/A'}</div>
+                    </div>
+                    <div class="prescription-actions">
+                        <button class="action-btn primary" data-action="view">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                        <button class="action-btn secondary" data-action="order">
+                            <i class="fas fa-shopping-cart"></i>
+                            Order
+                        </button>
+                    </div>
+                `;
+                
+                return card;
+            }
+
+            // Load prescription details
+            async function loadPrescriptionDetails(prescriptionId) {
+                try {
+                    const prescription = await prescriptionsApi.get(prescriptionId);
+                    
+                    // Update the detail view title and content
+                    const detailTitle = document.querySelector('.detail-title');
+                    detailTitle.textContent = `Prescription Details - #${prescriptionId}`;
+                    
+                    // Update medications table
+                    const tbody = document.querySelector('.medications-table tbody');
+                    tbody.innerHTML = prescription.medicines.map(med => `
+                        <tr>
+                            <td>
+                                <div class="medication-name">${med.name}</div>
+                                <div class="medication-dosage">${med.dose}</div>
+                            </td>
+                            <td>${med.dose}</td>
+                            <td>
+                                <div class="medication-frequency">
+                                    <span class="frequency-badge">${med.frequency}</span>
+                                </div>
+                            </td>
+                            <td>${med.duration || 'As needed'}</td>
+                            <td>${med.instructions || '-'}</td>
+                        </tr>
+                    `).join('');
+                    
+                    // Scroll to details
+                    document.getElementById('detail-view').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } catch (error) {
+                    showMessage('Failed to load prescription details: ' + error.message, true);
+                }
+            }
+
+            // Print functionality
+            document.querySelector('.action-btn.secondary').addEventListener('click', function() {
+                if (this.querySelector('.fa-print')) {
+                    alert('Printing prescription...');
+                    // In a real app, this would open print dialog
+                }
+            });
+        });
+    </script>
+</body>
+</html>

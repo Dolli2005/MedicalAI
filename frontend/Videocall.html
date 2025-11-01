@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Consultation | MediVerse.AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary-blue: #1a56db;
+            --dark-blue: #0f172a;
+            --midnight: #0a0f2b;
+            --slate: #64748b;
+            --light-slate: #94a3b8;
+            --platinum: #f8fafc;
+            --emerald: #059669;
+            --crimson: #dc2626;
+            --amber: #d97706;
+            --neural-purple: #7c3aed;
+        }
+
+        body {
+            background: var(--midnight);
+            color: var(--platinum);
+            overflow: hidden;
+            height: 100vh;
+            font-weight: 300;
+        }
+
+        /* Professional Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--platinum);
+        }
+
+        .logo-icon {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--light-slate);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--platinum);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+            background: rgba(26, 86, 219, 0.1);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .emergency-btn {
+            background: var(--crimson);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .emergency-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        /* Video Consultation Container */
+        .video-consult-container {
+            display: flex;
+            height: 100vh;
+            padding-top: 80px;
+            background: var(--midnight);
+        }
+
+        /* Video Section */
+        .video-section {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            gap: 1.5rem;
+        }
+
+        .video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .doctor-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .doctor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .doctor-details h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .doctor-details p {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+        }
+
+        .call-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 20px;
+            color: var(--emerald);
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--emerald);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .video-container {
+            position: relative;
+            flex: 1;
+            background: var(--dark-blue);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .remote-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .local-video {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-blue);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            object-fit: cover;
+        }
+
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .control-btn.end-call {
+            background: var(--crimson);
+        }
+
+        .control-btn.end-call:hover {
+            background: #b91c1c;
+        }
+
+        /* AI Panel Section */
+        .ai-panel {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 400px;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .panel-header i {
+            color: var(--neural-purple);
+            font-size: 1.5rem;
+        }
+
+        .panel-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .ai-feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ai-feature-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .feature-content {
+            color: var(--light-slate);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .transcript-container {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .transcript-line {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .transcript-speaker {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary-blue);
+        }
+
+        .transcript-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .symptoms-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .symptom-tag {
+            background: rgba(26, 86, 219, 0.2);
+            color: var(--primary-blue);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .ai-suggestions {
+            margin-top: 1rem;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .suggestion-icon {
+            color: var(--emerald);
+            font-size: 0.9rem;
+            margin-top: 0.1rem;
+        }
+
+        .suggestion-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #1e40af;
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--platinum);
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--light-slate);
+            animation: loading 1.4s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loading {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .video-consult-container {
+                flex-direction: column;
+            }
+            
+            .ai-panel {
+                max-width: 100%;
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .video-section {
+                padding: 1rem;
+            }
+            
+            .local-video {
+                width: 150px;
+                height: 112px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>MediVerse.AI</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-stethoscope"></i>
+                        Consultation
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-pills"></i>
+                        Pharmacy
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-microscope"></i>
+                        Diagnostics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-robot"></i>
+                        AI Assistant
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Analytics
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="emergency-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Emergency
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Video Consultation Container -->
+    <div class="video-consult-container">
+        <!-- Video Section -->
+        <div class="video-section">
+            <div class="video-header">
+                <div class="doctor-info">
+                    <div class="doctor-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="doctor-details">
+                        <h2>Dr. Sarah Johnson</h2>
+                        <p>Cardiologist • 15 years experience</p>
+                    </div>
+                </div>
+                <div class="call-status">
+                    <div class="status-dot"></div>
+                    <span>Call in progress - 12:45</span>
+                </div>
+            </div>
+
+            <div class="video-container">
+                <!-- Remote video (doctor) -->
+                <video class="remote-video" autoplay muted></video>
+                
+                <!-- Local video (patient) -->
+                <video class="local-video" autoplay muted></video>
+            </div>
+
+            <div class="video-controls">
+                <button class="control-btn" id="muteBtn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="control-btn" id="videoBtn">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button class="control-btn" id="screenShareBtn">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <button class="control-btn" id="recordBtn">
+                    <i class="fas fa-circle"></i>
+                </button>
+                <button class="control-btn end-call" id="endCallBtn">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Panel Section -->
+        <div class="ai-panel">
+            <div class="panel-header">
+                <i class="fas fa-robot"></i>
+                <h2>AI Medical Assistant</h2>
+            </div>
+
+            <!-- Real-time Transcription -->
+            <div class="ai-feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-comment-medical"></i>
+                    </div>
+                    <h3 class="feature-title">Real-time Transcription</h3>
+                </div>
+                <p class="feature-content">AI is transcribing your conversation with the doctor for accurate medical records.</p>
+                
+                <div class="transcript-container">
+                    <div class="transcript-line">
+                        <div class="transcript-speaker">Dr. Johnson:</div>
+                        <div class="transcript-text">Can you describe the chest pain you've been experiencing?</div>
+                    </div>
+                    <div class="transcript-line">
+                        <div class="transcript-speaker">You:</div>
+                        <div class="transcript-text">It's a sharp pain on the left side that comes and goes, especially when I'm stressed.</div>
+                    </div>
+                    <div class="transcript-line">
+                        <div class="transcript-speaker">Dr. Johnson:</div>
+                        <div class="transcript-text">How long has this been happening? And do you have any family history of heart conditions?</div>
+                    </div>
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Symptom Analysis -->
+            <div class="ai-feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <h3 class="feature-title">Symptom Analysis</h3>
+                </div>
+                <p class="feature-content">Based on your conversation, AI has identified these key symptoms:</p>
+                
+                <div class="symptoms-list">
+                    <span class="symptom-tag">Chest Pain</span>
+                    <span class="symptom-tag">Stress-related</span>
+                    <span class="symptom-tag">Intermittent</span>
+                    <span class="symptom-tag">Left-sided</span>
+                </div>
+
+                <div class="ai-suggestions">
+                    <div class="suggestion-item">
+                        <i class="fas fa-lightbulb suggestion-icon"></i>
+                        <div class="suggestion-text">Consider asking about stress management techniques</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <i class="fas fa-lightbulb suggestion-icon"></i>
+                        <div class="suggestion-text">Inquire about possible cardiac tests like ECG or stress test</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical History -->
+            <div class="ai-feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h3 class="feature-title">Medical History</h3>
+                </div>
+                <p class="feature-content">Your medical records show:</p>
+                
+                <div class="symptoms-list">
+                    <span class="symptom-tag">Hypertension</span>
+                    <span class="symptom-tag">High Cholesterol</span>
+                    <span class="symptom-tag">Family History: Heart Disease</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn secondary">
+                        <i class="fas fa-share"></i>
+                        Share Records
+                    </button>
+                    <button class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Add Note
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="ai-feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">AI Recommendations</h3>
+                </div>
+                <p class="feature-content">Based on symptoms and medical history, AI suggests:</p>
+                
+                <div class="ai-suggestions">
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle suggestion-icon"></i>
+                        <div class="suggestion-text">Discuss possibility of Holter monitor for 24-hour heart monitoring</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle suggestion-icon"></i>
+                        <div class="suggestion-text">Ask about lifestyle modifications to reduce cardiac risk factors</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <i class="fas fa-check-circle suggestion-icon"></i>
+                        <div class="suggestion-text">Inquire about medication adjustments if symptoms persist</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Video consultation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Video controls
+            const muteBtn = document.getElementById('muteBtn');
+            const videoBtn = document.getElementById('videoBtn');
+            const screenShareBtn = document.getElementById('screenShareBtn');
+            const recordBtn = document.getElementById('recordBtn');
+            const endCallBtn = document.getElementById('endCallBtn');
+
+            let isMuted = false;
+            let isVideoOn = true;
+            let isRecording = false;
+
+            // Mock video functionality (in a real app, this would connect to WebRTC)
+            const remoteVideo = document.querySelector('.remote-video');
+            const localVideo = document.querySelector('.local-video');
+
+            // Set up mock video streams (in a real app, these would be actual media streams)
+            remoteVideo.src = "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4";
+            localVideo.src = "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4";
+
+            // Toggle audio
+            muteBtn.addEventListener('click', function() {
+                isMuted = !isMuted;
+                if (isMuted) {
+                    muteBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                    muteBtn.style.background = 'var(--crimson)';
+                } else {
+                    muteBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    muteBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+                }
+                // In a real app, this would mute/unmute the audio track
+            });
+
+            // Toggle video
+            videoBtn.addEventListener('click', function() {
+                isVideoOn = !isVideoOn;
+                if (isVideoOn) {
+                    videoBtn.innerHTML = '<i class="fas fa-video"></i>';
+                    videoBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+                    localVideo.style.display = 'block';
+                } else {
+                    videoBtn.innerHTML = '<i class="fas fa-video-slash"></i>';
+                    videoBtn.style.background = 'var(--amber)';
+                    localVideo.style.display = 'none';
+                }
+                // In a real app, this would enable/disable the video track
+            });
+
+            // Screen sharing
+            screenShareBtn.addEventListener('click', function() {
+                alert('Screen sharing would start in a real implementation');
+                // In a real app, this would use getDisplayMedia()
+            });
+
+            // Recording
+            recordBtn.addEventListener('click', function() {
+                isRecording = !isRecording;
+                if (isRecording) {
+                    recordBtn.innerHTML = '<i class="fas fa-square"></i>';
+                    recordBtn.style.background = 'var(--crimson)';
+                    alert('Recording started');
+                } else {
+                    recordBtn.innerHTML = '<i class="fas fa-circle"></i>';
+                    recordBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+                    alert('Recording stopped');
+                }
+                // In a real app, this would use MediaRecorder API
+            });
+
+            // End call
+            endCallBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to end the call?')) {
+                    // In a real app, this would close the WebRTC connection
+                    window.location.href = 'consultation-dashboard.html'; // Redirect to consultation dashboard
+                }
+            });
+
+            // Emergency button
+            document.querySelector('.emergency-btn').addEventListener('click', function() {
+                alert('Emergency protocol activated. Medical assistance is on the way.');
+            });
+
+            // Simulate AI transcription updates
+            function updateTranscript() {
+                const transcriptContainer = document.querySelector('.transcript-container');
+                const newLine = document.createElement('div');
+                newLine.className = 'transcript-line';
+                
+                const speakers = ['Dr. Johnson:', 'You:'];
+                const messages = [
+                    'Have you noticed any other symptoms like shortness of breath or dizziness?',
+                    'Sometimes I feel a bit lightheaded when the pain is strong.',
+                    'I recommend we schedule an ECG and possibly a stress test to rule out any cardiac issues.',
+                    'That sounds reasonable. When can we schedule those tests?'
+                ];
+                
+                const randomSpeaker = speakers[Math.floor(Math.random() * speakers.length)];
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                
+                newLine.innerHTML = `
+                    <div class="transcript-speaker">${randomSpeaker}</div>
+                    <div class="transcript-text">${randomMessage}</div>
+                `;
+                
+                transcriptContainer.insertBefore(newLine, transcriptContainer.querySelector('.loading-dots'));
+                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+            }
+
+            // Update transcript every 10-20 seconds
+            setInterval(updateTranscript, 15000);
+        });
+    </script>
+</body>
+</html>
